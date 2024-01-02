@@ -2,24 +2,59 @@ from lyzr import DataAnalyzr, DataConnector
 import streamlit as st
 import pandas as pd
 import io
+import re
 
-openai_api_key = st.text_input("Enter your OpenAI API key:", type="password")
+error_messages = []
+
+UPLOADED_FILE_KEY = "uploaded_csv"
+API_KEY = "api_key"
+
+def validate_api_key(key):
+    """Function to validate the OpenAI API key"""
+    return re.match(r"^sk-[a-zA-Z0-9]{48}$", key) is not None
+
+placeholder_text = (
+    "You can find your OpenAI API key here: https://platform.openai.com/api-keys"
+)
+
+openai_api_key = st.text_input(
+    "Enter your OpenAI API key:", value="", help=placeholder_text
+)
+
+if openai_api_key:
+    if validate_api_key(openai_api_key):
+        st.session_state[
+            API_KEY
+        ] = openai_api_key
+    else:
+        error_messages.append("The API key is invalid. Please enter a valid OpenAI API key.")
+        openai_api_key = None
+else:
+    error_messages.append("Please enter an OpenAI API key.")
+
+
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
-df = None
-error_messages = []
-if uploaded_file is None:
-    error_messages.append('Please upload a CSV file.')
-if not openai_api_key:
-    error_messages.append('Please enter an OpenAI API key.')
+df = pd.DataFrame()
+
 if uploaded_file is not None:
+    st.session_state[UPLOADED_FILE_KEY] = uploaded_file
     try:
         df = pd.read_csv(uploaded_file)
-        st.success("File Uploaded Successfully!")
+    except pd.errors.EmptyDataError:
+        error_messages.append("The CSV file is empty.")
+    except pd.errors.ParserError as e:
+        error_messages.append(f"An error occurred parsing the CSV file: {e}")
     except Exception as e:
         error_messages.append(f"An error occurred when reading the CSV file: {e}")
 
-if not error_messages and df is not None:
+if UPLOADED_FILE_KEY in st.session_state:
+    uploaded_file = st.session_state[UPLOADED_FILE_KEY]
+else:
+    error_messages.append("Please upload a CSV file")
+
+
+if not error_messages and uploaded_file:
     try:
         data_analyzr = DataAnalyzr(df=df, api_key=openai_api_key)
     except Exception as e:
