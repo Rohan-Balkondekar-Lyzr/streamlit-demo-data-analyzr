@@ -94,13 +94,12 @@ else:
 
 # Check if the uploaded file is ready to be processed
 if uploaded_file is not None:
-    stringio = StringIO(uploaded_file.getvalue().decode('utf-8'))
     try:
         # Since UploadedFile behaves like a file-like object, use StringIO to convert it to a StringIO object
         # This is required to help pandas recognize it as a file-like object
         # This code assumes that the CSV file is comma-delimited
-        df = pd.read_csv(stringio)
         df = pd.read_csv(uploaded_file)
+        st.write(df.head())
     except pd.errors.EmptyDataError:
         error_messages.append("The CSV file is empty.")
     except pd.errors.ParserError as e:
@@ -127,11 +126,13 @@ if not error_messages and uploaded_file:
     if analyze_clicked and query:
         with st.spinner("Analyzing..."):
             try:
+                data_analyzr = DataAnalyzr(df=df, api_key=openai_api_key)
+                st.write(df)
                 # Perform analysis and write to session state
-                st.session_state[ANALYSIS_RESULTS_KEY] = data_analyzr.analysis_insights(
+                analysis = data_analyzr.analysis_insights(
                     user_input=query
                 )
-                st.write(st.session_state[ANALYSIS_RESULTS_KEY])
+                st.write(analysis)
                 st.success("Analysis complete!")
             except Exception as e:
                 st.error(f"An error occurred during analysis: {e}")
