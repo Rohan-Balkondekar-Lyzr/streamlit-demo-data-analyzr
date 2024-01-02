@@ -1,19 +1,28 @@
 from lyzr import DataAnalyzr, DataConnector
 import streamlit as st
+import pandas as pd
 import io
 
 openai_api_key = st.text_input("Enter your OpenAI API key:", type="password")
 uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
+df = None
 error_messages = []
 if uploaded_file is None:
     error_messages.append('Please upload a CSV file.')
 if not openai_api_key:
     error_messages.append('Please enter an OpenAI API key.')
+if uploaded_file is not None:
+    try:
+        df = pd.read_csv(uploaded_file)
+    except Exception as e:
+        error_messages.append(f"An error occurred when reading the CSV file: {e}")
 
-if not error_messages:
-    df = DataConnector().fetch_dataframe_from_csv(file_path=uploaded_file)
-    data_analyzr = DataAnalyzr(df=df, api_key=openai_api_key)
+if not error_messages and df is not None:
+    try:
+        data_analyzr = DataAnalyzr(df=df, api_key=openai_api_key)
+    except Exception as e:
+        st.error(f"Error while initializing DataAnalyzr: {e}")
 
     analysis_query = st.text_input("### Enter your query related to the data:")
     analyze_clicked = st.button('Analyze')
