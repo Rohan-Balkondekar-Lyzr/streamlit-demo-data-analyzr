@@ -15,6 +15,7 @@ if not openai_api_key:
 if uploaded_file is not None:
     try:
         df = pd.read_csv(uploaded_file)
+        st.success("File Uploaded Successfully!")
     except Exception as e:
         error_messages.append(f"An error occurred when reading the CSV file: {e}")
 
