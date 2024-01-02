@@ -127,7 +127,8 @@ if not error_messages and uploaded_file:
         with st.spinner("Analyzing..."):
             try:
                 data_analyzr = DataAnalyzr(df=df, api_key=openai_api_key)
-                st.write(df)
+                st.write(df.head())
+                st.write(query)
                 # Perform analysis and write to session state
                 analysis = data_analyzr.analysis_insights(
                     user_input=query
@@ -135,7 +136,7 @@ if not error_messages and uploaded_file:
                 st.write(analysis)
                 st.success("Analysis complete!")
             except Exception as e:
-                st.error(f"An error occurred during analysis: {e}")
+                st.error(f"issue one: {e}")
 
     elif visualize_clicked and query:
         with st.spinner("Visualizing..."):
@@ -145,8 +146,8 @@ if not error_messages and uploaded_file:
                     image = io.BytesIO(image_bytes)
                     st.image(image, use_column_width=True)
                     st.success("Visualization complete!")
-            except Exception as e:
-                st.error(f"An error occurred during visualization: {e}")
+            # except Exception as e:
+            #     st.error(f"An error occurred during visualization: {e}")
 
     with st.expander("More"):
         st.markdown("Analysis Suggestions:")
