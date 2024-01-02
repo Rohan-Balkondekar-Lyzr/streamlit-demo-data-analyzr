@@ -6,6 +6,7 @@ import io
 import ast
 import pandas as pd
 import streamlit as st
+from io import StringIO
 from lyzr import DataAnalyzr
 
 st.image("./assets/Lyzr-Logo.webp", width=150)
@@ -93,10 +94,12 @@ else:
 
 # Check if the uploaded file is ready to be processed
 if uploaded_file is not None:
+    stringio = StringIO(uploaded_file.getvalue().decode('utf-8'))
     try:
         # Since UploadedFile behaves like a file-like object, use StringIO to convert it to a StringIO object
         # This is required to help pandas recognize it as a file-like object
         # This code assumes that the CSV file is comma-delimited
+        df = pd.read_csv(stringio)
         df = pd.read_csv(uploaded_file)
     except pd.errors.EmptyDataError:
         error_messages.append("The CSV file is empty.")
