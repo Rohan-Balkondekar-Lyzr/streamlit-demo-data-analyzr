@@ -6,7 +6,6 @@ import io
 import ast
 import pandas as pd
 import streamlit as st
-import plotly.graph_objs as go
 from lyzr import DataAnalyzr
 
 st.image("./assets/Lyzr-Logo.webp", width=150)
