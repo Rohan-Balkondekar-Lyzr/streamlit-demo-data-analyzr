@@ -130,9 +130,7 @@ if not error_messages and uploaded_file:
                 st.write(df.head())
                 st.write(query)
                 # Perform analysis and write to session state
-                analysis = data_analyzr.analysis_insights(
-                    user_input=query
-                )
+                analysis = data_analyzr.analysis_insights(user_input=query)
                 st.write(analysis)
                 st.success("Analysis complete!")
             except Exception as e:
@@ -140,14 +138,14 @@ if not error_messages and uploaded_file:
 
     elif visualize_clicked and query:
         with st.spinner("Visualizing..."):
-            try:
-                visualizations = data_analyzr.visualizations(user_input=query)
-                for image_name, image_bytes in visualizations.items():
-                    image = io.BytesIO(image_bytes)
-                    st.image(image, use_column_width=True)
-                    st.success("Visualization complete!")
-            # except Exception as e:
-            #     st.error(f"An error occurred during visualization: {e}")
+            # try:
+            visualizations = data_analyzr.visualizations(user_input=query)
+            for image_name, image_bytes in visualizations.items():
+                image = io.BytesIO(image_bytes)
+                st.image(image, use_column_width=True)
+                st.success("Visualization complete!")
+        # except Exception as e:
+        #     st.error(f"An error occurred during visualization: {e}")
 
     with st.expander("More"):
         st.markdown("Analysis Suggestions:")
